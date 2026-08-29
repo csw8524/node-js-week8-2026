@@ -4,6 +4,10 @@ const { DataSource } = require('typeorm')
 // ============================================================
 // TODO：把你設計的 entity require 進來，然後加進下方的 entities 陣列
 //（沒註冊的 entity，migration:generate 看不到它，所以這張資料表就不會被建出來）
+const Class = require('../entities/Class')
+const Subject = require('../entities/Subject')
+const Student = require('../entities/Student')
+const Grade = require('../entities/Grade')
 // ============================================================
 
 const dataSource = new DataSource({
@@ -19,6 +23,10 @@ const dataSource = new DataSource({
 
   entities: [
     // TODO: 你的 entities
+    Class,
+    Subject,
+    Student,
+    Grade,
   ],
   migrations: ['db/migrations/*.js'],
 })

@@ -10,6 +10,10 @@ const { dataSource } = require('./data-source')
 async function clearAll() {
   const ORDER = [
     // TODO: 按「你的」FK 依賴順序填 entity name（先刪 Grade，再 Student，最後 Class / Subject）
+    'Grade',
+    'Student',
+    'Class',
+    'Subject',
   ]
   for (const name of ORDER) {
     if (dataSource.hasMetadata(name)) {
@@ -22,11 +26,59 @@ async function main() {
   await dataSource.initialize()
   await clearAll()
 
+  const classRepo = dataSource.getRepository('Class')
+  const subjectRepo = dataSource.getRepository('Subject')
+  const studentRepo = dataSource.getRepository('Student')
+  const gradeRepo = dataSource.getRepository('Grade')
+
   // ================================================================================
   // TODO：依照任務內容的規格種資料（至少 2 班、2 科目、幾位學生、幾筆成績）
   //   1. 先種 CLASS / SUBJECT
+  const classA = await classRepo.save({ name: '一年甲班' })
+  const classB = await classRepo.save({ name: '一年乙班' })
+
+  const math = await subjectRepo.save({ name: '數學' })
+  const english = await subjectRepo.save({ name: '英文' })
+
   //   2. 再種 STUDENT（記得接上 class）
+  const student1 = await studentRepo.save({
+    name: '小明',
+    class: classA,
+  })
+
+  const student2 = await studentRepo.save({
+    name: '小華',
+    class: classA,
+  })
+
+  const student3 = await studentRepo.save({
+    name: '小美',
+    class: classB,
+  })
+  
   //   3. 最後種 GRADE（記得接上 student + subject）
+  await gradeRepo.save([
+    {
+      score: 90,
+      student: student1,
+      subject: math,
+    },
+    {
+      score: 85,
+      student: student1,
+      subject: english,
+    },
+    {
+      score: 78,
+      student: student2,
+      subject: math,
+    },
+    {
+      score: 92,
+      student: student3,
+      subject: english,
+    },
+  ])
   //      關聯的接法：relation 屬性直接放前面存好的物件（TypeORM 會自動取出 id 填進外鍵），例如：
   //      studentRepo.save({ name: '...', class: 班級物件 })
   //      gradeRepo.save({ score: 95, student: 學生物件, subject: 科目物件 })
